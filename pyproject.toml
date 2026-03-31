@@ -1,0 +1,26 @@
+[build-system]
+requires = [
+  "setuptools",
+  "wheel",
+  "numpy"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iq-ml"
+version = "1.0"
+description = "Inspiration-Q Machine Learning optimization API"
+readme = "README.md"
+dependencies = [
+  "numpy",
+  "requests"
+]
+
+[project.urls]
+Homepage = "https://www.inspiration-q.com"
+Repository = "https://github.com/iQ-code/iq-ml"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["iq.*"]
+namespaces = true

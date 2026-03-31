@@ -24,6 +24,8 @@ def _validate_observation_vector(y: NDArray, X: NDArray):
             raise Exception(
                 f"Number of observations in y: {y.shape[0]} and X: {X.shape[0]} does not match"
             )
+        if np.any(y == -1):
+            y = np.where(y == -1, 0, y)
         y = y.tolist()
     return y
 

@@ -89,8 +89,14 @@ For a fixed support, the logistic model weights and intercept $b$ are fit by sta
 
 ### API Endpoint
 
+When `accelerate` is disabled:
 ```
 POST https://www.inspiration-q.com/api/v1/iq-ml/logistic-regression
+```
+
+When `accelerate` is enabled (default):
+```
+POST https://www.inspiration-q.com/api/v1/iq-ml/sparse-fdr-regression
 ```
 
 ### Input Parameters
@@ -101,9 +107,9 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/logistic-regression
 | `y` | array | Binary label vector; labels should be +1 / −1 or 1 / 0 |
 | `k` | integer | Number of features to select (1 ≤ k ≤ n_features − 1) |
 | `lambda_l2` | float | L2 regularization parameter (default: `0.0`) |
+| `accelerate` | bool | If true, uses the Fisher Discriminant Ratio as a simpler and faster classifier for the solution exploration step instead of logistic regression. Faster but may find less optimal results (default: `true`) |
 | `options.copies` | integer | Number of trajectories (default: `100`) |
 | `options.tol` | float | Inner solver tolerance (default: `1e-6`) |
-| `options.n_jobs` | integer | Parallel jobs for inner solver (default: `1`) |
 | `random_number_generator_seed` | integer | RNG seed (default: `123321`) |
 | `description` | string | Optional label |
 
@@ -125,55 +131,3 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/logistic-regression
   "weights": [-0.12, 1.87, -1.53]
 }
 ```
-
----
-
-## 1.4. Sparse FDR Regression
-
-### Problem Definition
-
-The Fisher Discriminant Ratio (FDR) criterion selects the $k$ features that best **linearly separate** two classes. For a projection direction $w$, the FDR is defined as:
-
-$$
-\text{FDR}(w) = \frac{\left(w^T (\mu_1 - \mu_0)\right)^2}{w^T (\Sigma_1 + \Sigma_0)\, w}
-$$
-
-where $\mu_c$ and $\Sigma_c$ are the class-conditional mean and covariance matrix of class $c \in \{0, 1\}$.
-
-The sparse FDR problem finds the $k$-element support that maximizes the FDR:
-
-$$
-\max_{S \subseteq \{1,\ldots,p\},\, |S|=k} \quad \text{FDR}(w_S^*)
-$$
-
-where $w_S^*$ is the optimal FDR direction restricted to support $S$ (closed-form within $S$). A logit model is then fit on the selected features to produce a probabilistic classifier.
-
-**When to prefer FDR over logistic regression:**
-- When the number of samples is small relative to the number of features (high-dimensional regime), the FDR criterion has a closed-form inner solution and is numerically more stable.
-- When class imbalance is present, FDR is less sensitive than logistic regression.
-
-### API Endpoint
-
-```
-POST https://www.inspiration-q.com/api/v1/iq-ml/sparse-fdr-regression
-```
-
-### Input Parameters
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `X` | array | Feature matrix of shape (n_samples, n_features); max 100000 × 2048 |
-| `y` | array | Binary label vector; labels should be +1 / −1 or 1 / 0 |
-| `k` | integer | Number of features to select (1 ≤ k ≤ n_features − 1) |
-| `lambda_l2` | float | L2 regularization added to within-class covariances (default: `0.0`) |
-| `options.copies` | integer | Number of trajectories (default: `100`) |
-| `options.tol` | float | Inner solver tolerance (default: `1e-6`) |
-| `random_number_generator_seed` | integer | RNG seed (default: `123321`) |
-| `description` | string | Optional label |
-
-### Output Parameters
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `solution` | array | Integer vector of length k; indices of the selected features (0-indexed) |
-| `weights` | array | Logit model coefficients; first element is the intercept, followed by k feature weights |

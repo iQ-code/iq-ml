@@ -132,7 +132,7 @@ X = rng.standard_normal((n_samples, n_features))
 y = np.sign(X[:, 3] - X[:, 9] + 0.3 * rng.standard_normal(n_samples))
 y[y == 0] = 1
 
-selected, weights = iq.ml.logistic_regression.solve_logreg_pa(
+selected, weights = iq.ml.logistic_regression.solve_sparse_logreg(
     X, y,
     k=k,
     lambda_l2=0.01,
@@ -144,42 +144,3 @@ selected, weights = iq.ml.logistic_regression.solve_logreg_pa(
 print("Selected features:", list(selected))
 print("Model weights (intercept + k features):", np.round(weights, 4))
 ```
-
----
-
-## 3.6. Sparse FDR Regression
-
-```python
-import numpy as np
-import iq.api.iqrestapi
-import iq.ml.fdr_regression
-
-iq.api.iqrestapi.initialize_credentials("YOUR_API_KEY")
-
-rng = np.random.default_rng(2)
-n_samples, n_features, k = 200, 30, 3
-
-X = rng.standard_normal((n_samples, n_features))
-
-# True signal on features 5, 14, 22
-y = np.sign(X[:, 5] - 0.8 * X[:, 14] + 0.5 * X[:, 22]
-            + 0.3 * rng.standard_normal(n_samples))
-y[y == 0] = 1
-
-selected, weights = iq.ml.fdr_regression.solve_fdr_pa(
-    X, y,
-    k=k,
-    lambda_l2=0.01,
-    options={"copies": 100},
-    random_number_generator_seed=123321,
-    description="Sparse FDR example",
-)
-
-print("Selected features:", list(selected))
-print("Model weights (intercept + k features):", np.round(weights, 4))
-```
-
-The FDR criterion is particularly effective in high-dimensional settings where
-the number of features is large relative to the number of samples.
-
-You can find more complete examples in the [examples/](../examples/) folder.

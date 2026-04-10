@@ -8,7 +8,6 @@ regression and FDR-based feature selection.
 import numpy as np
 import iq.api.iqrestapi
 import iq.ml.logistic_regression
-import iq.ml.fdr_regression
 
 iq.api.iqrestapi.initialize_credentials("YOUR_API_KEY")
 
@@ -32,7 +31,7 @@ print(f"Class balance: {(y == 1).sum()} positive, {(y == -1).sum()} negative")
 print()
 
 # --- Sparse logistic regression ---
-selected_lr, weights_lr = iq.ml.logistic_regression.solve_logreg_pa(
+selected_lr, weights_lr = iq.ml.logistic_regression.solve_sparse_logreg(
     X, y,
     k=k,
     lambda_l2=0.01,
@@ -45,17 +44,4 @@ print(f"  Selected features: {list(selected_lr)}")
 print(f"  Model weights (intercept + k features): {np.round(weights_lr, 4)}")
 print()
 
-# --- Sparse FDR regression ---
-selected_fdr, weights_fdr = iq.ml.fdr_regression.solve_fdr_pa(
-    X, y,
-    k=k,
-    lambda_l2=0.01,
-    options={"copies": 100},
-    random_number_generator_seed=42,
-    description="Sparse FDR example",
-)
-print("Sparse FDR Regression:")
-print(f"  Selected features: {list(selected_fdr)}")
-print(f"  Model weights (intercept + k features): {np.round(weights_fdr, 4)}")
-print()
 print(f"True features were: {true_features}")

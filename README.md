@@ -20,7 +20,6 @@ All details are explained in the `doc/` folder:
 |--------|--------|-------------|
 | `iq.ml.linear_regression` | Sparse linear regression | `v1/iq-ml/linear-regression` |
 | `iq.ml.logistic_regression` | Sparse logistic regression | `v1/iq-ml/logistic-regression` |
-| `iq.ml.fdr_regression` | Sparse FDR regression | `v1/iq-ml/sparse-fdr-regression` |
 
 ---
 

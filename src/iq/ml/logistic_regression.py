@@ -30,7 +30,7 @@ def _validate_observation_vector(y, X):
     return y
 
 
-def solve_logreg_pa(
+def solve_sparse_logreg(
     X: NDArray[np.float64],
     y: NDArray[np.float64],
     k: int,

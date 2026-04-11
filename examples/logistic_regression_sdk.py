@@ -36,7 +36,7 @@ selected_lr, weights_lr = iq.ml.logistic_regression.solve_sparse_logreg(
     k=k,
     lambda_l2=0.01,
     options={"copies": 100},
-    random_number_generator_seed=42,
+    random_number_generator_seed=123321,
     description="Sparse logreg example",
 )
 print("Sparse Logistic Regression:")

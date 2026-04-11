@@ -8,9 +8,9 @@ Welcome to **iQ-ML**, the SDK and documentation for Inspiration-Q's sparse machi
 
 All details are explained in the `doc/` folder:
 
-1. **[iQ-ML](doc/1-iq-ml.md)** — Problem definitions, API endpoints, and input/output reference for all solvers.
-2. **[Accessing the API](doc/2-accessing-the-api.md)** — cURL and Python examples for interacting with the REST API directly.
-3. **[iQ-ML SDK](doc/3-iq-ml-sdk.md)** — Installing and using the Python SDK.
+1. **[iQ-ML](doc/1-iq-ml.md)** - Problem definitions, API endpoints, and input/output reference for all solvers.
+2. **[Accessing the API](doc/2-accessing-the-api.md)** - cURL and Python examples for interacting with the REST API directly.
+3. **[iQ-ML SDK](doc/3-iq-ml-sdk.md)** - Installing and using the Python SDK.
 
 ---
 

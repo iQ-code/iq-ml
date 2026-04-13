@@ -45,7 +45,7 @@ def set_auth(auth):
     return
 
 
-def post(*args, **kwdargs):
+def post(*args, **kwargs):
     """Send a POST request to the Inspiration-Q API and return the response.
 
     Wraps _post with the global base URL, URL dictionary, and auth headers.
@@ -55,7 +55,7 @@ def post(*args, **kwdargs):
     ----------
     *args
         Positional arguments forwarded to _post (first is the function name).
-    **kwdargs
+    **kwargs
         Keyword arguments forwarded to _post (e.g., json payload).
 
     Returns
@@ -68,7 +68,7 @@ def post(*args, **kwdargs):
     RuntimeError
         If the API returns an exception field in the response body.
     """
-    r_json = _post(_base_url, _state.url_dict, _state.auth, *args, **kwdargs)
+    r_json = _post(_base_url, _state.url_dict, _state.auth, *args, **kwargs)
     if "exception" in r_json:
         raise RuntimeError(r_json["exception"])
     return r_json

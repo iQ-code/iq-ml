@@ -97,8 +97,10 @@ print(df_train_full.head())
 # %%
 TARGET_COLUMN = "SalePrice"
 
-# Separate target before filtering columns.
-y_full = df_train_full[TARGET_COLUMN].copy()
+# Separate target before filtering columns and rescale to millions so that
+# the target values sit in a comparable range to the standardized features.
+PRICE_SCALE = 1e6
+y_full = df_train_full[TARGET_COLUMN].copy() / PRICE_SCALE
 
 # Keep only numerical feature columns (exclude the target).
 numerical_columns = (
@@ -216,7 +218,7 @@ selected_feature_indices = np.sort(np.asarray(sparse_coefficients, dtype=int))
 ols_model = LinearRegression()
 ols_model.fit(X_train[:, selected_feature_indices], y_train)
 
-print(f"Training MSE (API)       : {training_mse:,.2f}")
+print(f"Training MSE (API)       : {training_mse:.2e}")
 print(f"Selected feature indices : {selected_feature_indices.tolist()}")
 print(f"Selected feature names   : {feature_names[selected_feature_indices].tolist()}")
 print()
@@ -329,7 +331,7 @@ for k in k_values:
         "rmse_val": round(rmse_k, 2),
         "r_squared_val": round(r_squared_k, 4),
     })
-    print(f"k = {k:3d}  |  RMSE (val) = {rmse_k:12,.2f}  |  R2 (val) = {r_squared_k:.4f}")
+    print(f"k = {k:3d}  |  RMSE (val) = {rmse_k:6.2f}  |  R2 (val) = {r_squared_k:.4f}")
 
 df_sweep = pd.DataFrame(sweep_results)
 print()
@@ -366,7 +368,7 @@ best_ols.fit(X_train[:, best_feature_indices], y_train)
 y_pred_test_best = best_ols.predict(X_test[:, best_feature_indices])
 r_squared_test_best = r2_score(y_test, y_pred_test_best)
 rmse_test_best = np.sqrt(mean_squared_error(y_test, y_pred_test_best))
-print(f"Test RMSE with k={best_k}: {rmse_test_best:,.2f}")
+print(f"Test RMSE with k={best_k}: {rmse_test_best:.2e}")
 print(f"Test R2 with k={best_k}  : {r_squared_test_best:.4f}")
 
 weights = dict(
@@ -386,24 +388,18 @@ for feat, w in weights.items():
 # ## Step 10 - Generate Predictions on the Kaggle Test Set
 #
 # Finally, we use the best sparse coefficients obtained in Step 9 to
-# generate predictions on the Kaggle test set. These predictions can be
-# exported to a CSV file and submitted to the competition.
+# generate predictions on the Kaggle test set. 
 
 # %%
+# Predict in millions, then convert back to dollars for the submission.
 y_pred_kaggle_test = best_ols.predict(X_kaggle_test[:, best_feature_indices])
 
 # Build a submission dataframe with the original test set index.
 df_submission = pd.DataFrame({
     "Id": df_test.index,
-    "SalePrice": y_pred_kaggle_test,
+    "SalePrice": y_pred_kaggle_test * PRICE_SCALE,
 })
 
-SUBMISSION_PATH = Path("./data/submission.csv")
-df_submission.to_csv(SUBMISSION_PATH, index=False)
-
-print(f"Predictions generated for {len(y_pred_kaggle_test)} test samples.")
-print(f"Submission saved to: {SUBMISSION_PATH}")
-print()
 print(df_submission.head(10))
 
 # %% [markdown]

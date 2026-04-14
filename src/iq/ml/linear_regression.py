@@ -83,10 +83,9 @@ def solve_sparse_linreg(
     Returns
     -------
     s : NDArray[np.float64]
-        Coefficient vector of length n_features. Exactly k elements are
-        nonzero; all others are exactly 0.
+        Array of length k containing the indices of the selected features.
     MSE : float
-        Mean squared error of the solution: (1/n) ||y - X s||^2.
+        Mean squared error of the solution on the training data.
 
     """
     options = dict(options) if options is not None else {}

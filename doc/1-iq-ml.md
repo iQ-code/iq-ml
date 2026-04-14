@@ -2,7 +2,7 @@
 
 ## 1.1. Overview
 
-**iQ-ML** is Inspiration-Q's suite of sparse machine-learning solvers. All three solvers tackle the same fundamental challenge: **feature selection** — given a dataset with many features, find the small subset of $k$ features that best explains the target variable, while fitting a model on those features alone.
+**iQ-ML** is Inspiration-Q's suite of sparse machine-learning solvers. All three solvers tackle the same fundamental challenge: **feature selection** - given a dataset with many features, find the small subset of $k$ features that best explains the target variable, while fitting a model on those features alone.
 
 Classical solvers (e.g. LASSO) impose a soft sparsity penalty that can leave many small nonzero coefficients. iQ-ML solvers enforce an **exact cardinality constraint** ($\|w\|_0 = k$), producing solutions that are exactly $k$-sparse. This hard constraint is combinatorially hard in general; the solvers use a quantum-inspired algorithm to find high-quality solutions efficiently at scale.
 

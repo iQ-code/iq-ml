@@ -13,7 +13,10 @@ description = "Inspiration-Q Machine Learning optimization API"
 readme = "README.md"
 dependencies = [
   "numpy",
-  "requests"
+  "requests",
+  "pandas",
+  "scikit-learn",
+  "ipykernel"
 ]
 
 [project.urls]

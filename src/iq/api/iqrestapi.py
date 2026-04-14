@@ -71,6 +71,15 @@ def post(function, waittime=1, **kwargs):
     ------
     RuntimeError
         If the API returns an exception field in the response body.
+    ValueError
+        If the function name is not in the known URL dictionary.
+    requests.HTTPError
+        If the HTTP response indicates an unsuccessful status code.
+    requests.ConnectionError
+        If a network-related error occurs.
+    TimeoutError
+        If the computation exceeds the maximum allowed time.
+
     """
     r_json = _post(
         _base_url, _state.url_dict, _state.auth, function, waittime=waittime, **kwargs
@@ -99,15 +108,17 @@ def _get(url, headers, **kwargs):
 
     Raises
     ------
-    ConnectionError
-        If the HTTP response indicates an error.
+    requests.HTTPError
+        If the HTTP response indicates an unsuccessful status code.
+    requests.ConnectionError
+        If a network-related error occurs.
 
     """
     logger.debug(f"Sending GET request to {url} with headers {headers} and arguments {kwargs}")
     r = requests.get(url=url, headers=headers, timeout=_HTTP_TIMEOUT, **kwargs)
     logger.debug(f"Received GET response {r} with content: {r.content}")
     if not r.ok:
-        raise ConnectionError(f"Error returned from Inspiration-Q API: {r}")
+        raise requests.HTTPError(f"Error returned from Inspiration-Q API: {r}", response=r)
     return r.json()
 
 
@@ -147,8 +158,10 @@ def _post(base_url, url_dict, auth, function, waittime=1, **kwargs):
     ------
     ValueError
         If the function name is not in the known URL dictionary.
-    ConnectionError
-        If the API returns an HTTP error response.
+    requests.HTTPError
+        If the HTTP response indicates an unsuccessful status code.
+    requests.ConnectionError
+        If a network-related error occurs.
     TimeoutError
         If the computation exceeds the maximum allowed time.
 
@@ -164,8 +177,9 @@ def _post(base_url, url_dict, auth, function, waittime=1, **kwargs):
     r = requests.post(url=url, headers=headers, timeout=_HTTP_TIMEOUT, **kwargs)
     logger.debug(f"Received POST response {r} with content: {r.content}")
     if not r.ok:
-        raise ConnectionError(
-            f"Error returned from Inspiration-Q API. function: {function}. response: {r}"
+        raise requests.HTTPError(
+            f"Error returned from Inspiration-Q API. function: {function}. response: {r}",
+            response=r,
         )
 
     body = r.json()

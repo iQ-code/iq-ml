@@ -45,7 +45,7 @@ def set_auth(auth):
     return
 
 
-def post(*args, **kwargs):
+def post(function, waittime=1, **kwargs):
     """Send a POST request to the Inspiration-Q API and return the response.
 
     Wraps _post with the global base URL, URL dictionary, and auth headers.
@@ -53,10 +53,14 @@ def post(*args, **kwargs):
 
     Parameters
     ----------
-    *args
-        Positional arguments forwarded to _post (first is the function name).
+    function : str
+        API entry point name (e.g. ``"v1/iq-ml/linear-regression"``).
+    waittime : float, optional
+        Initial polling interval in seconds. Doubles after each poll up to
+        a maximum of 5 s. Default is 1.
     **kwargs
-        Keyword arguments forwarded to _post (e.g., json payload).
+        Additional keyword arguments forwarded to ``requests.post``
+        (e.g. ``json=``, ``data=``, ``params=``).
 
     Returns
     -------
@@ -68,13 +72,15 @@ def post(*args, **kwargs):
     RuntimeError
         If the API returns an exception field in the response body.
     """
-    r_json = _post(_base_url, _state.url_dict, _state.auth, *args, **kwargs)
+    r_json = _post(
+        _base_url, _state.url_dict, _state.auth, function, waittime=waittime, **kwargs
+    )
     if "exception" in r_json:
         raise RuntimeError(r_json["exception"])
     return r_json
 
 
-def _get(url, headers, **arguments):
+def _get(url, headers, **kwargs):
     """Send a GET request and return the parsed JSON response.
 
     Parameters
@@ -83,7 +89,7 @@ def _get(url, headers, **arguments):
         Full URL to send the request to.
     headers : dict
         Dictionary of HTTP headers (including auth).
-    **arguments
+    **kwargs
         Additional keyword arguments passed to requests.get.
 
     Returns
@@ -95,16 +101,17 @@ def _get(url, headers, **arguments):
     ------
     ConnectionError
         If the HTTP response indicates an error.
+
     """
-    logger.debug(f"Sending GET request to {url} with headers {headers} and arguments {arguments}")
-    r = requests.get(url=url, headers=headers, timeout=_HTTP_TIMEOUT, **arguments)
+    logger.debug(f"Sending GET request to {url} with headers {headers} and arguments {kwargs}")
+    r = requests.get(url=url, headers=headers, timeout=_HTTP_TIMEOUT, **kwargs)
     logger.debug(f"Received GET response {r} with content: {r.content}")
     if not r.ok:
         raise ConnectionError(f"Error returned from Inspiration-Q API: {r}")
     return r.json()
 
 
-def _post(base_url, url_dict, auth, function, waittime=1, **arguments):
+def _post(base_url, url_dict, auth, function, waittime=1, **kwargs):
     """Send a POST request and poll for the result until the computation completes.
 
     Submits the request to the appropriate endpoint and then polls the
@@ -123,13 +130,18 @@ def _post(base_url, url_dict, auth, function, waittime=1, **arguments):
         API endpoint name (key in url_dict).
     waittime : float
         Initial polling interval in seconds. Doubles up to 5s (default 1).
-    **arguments
+    **kwargs
         Additional keyword arguments passed to requests.post (e.g., json).
 
     Returns
     -------
     dict
-        Parsed JSON response body containing the computation result.
+        Parsed JSON response body containing the computation result. It has this format:
+        {
+            "computationId": "9970243c-44f7-4150-ab81-29c725feeabf",
+            "status": "Pending",
+            "computationStoreTime":"2024-03-14T17:06:15.452113+00:00"
+        }
 
     Raises
     ------
@@ -139,6 +151,7 @@ def _post(base_url, url_dict, auth, function, waittime=1, **arguments):
         If the API returns an HTTP error response.
     TimeoutError
         If the computation exceeds the maximum allowed time.
+
     """
     headers = auth
 
@@ -147,8 +160,8 @@ def _post(base_url, url_dict, auth, function, waittime=1, **arguments):
         raise ValueError(f"Unknown API function {function}")
 
     url = url_dict[function]
-    logger.debug(f"Sending POST request to {url} with headers {headers} and arguments {arguments}")
-    r = requests.post(url=url, headers=headers, timeout=_HTTP_TIMEOUT, **arguments)
+    logger.debug(f"Sending POST request to {url} with headers {headers} and arguments {kwargs}")
+    r = requests.post(url=url, headers=headers, timeout=_HTTP_TIMEOUT, **kwargs)
     logger.debug(f"Received POST response {r} with content: {r.content}")
     if not r.ok:
         raise ConnectionError(
@@ -159,14 +172,6 @@ def _post(base_url, url_dict, auth, function, waittime=1, **arguments):
 
     if not body.get("status", False):
         return body
-
-    # response has this format (we add "-" to avoid Ruff warnings):
-    # { -
-    #     "computationId": "9970243c-44f7-4150-ab81-29c725feeabf", -
-    #     "status": "Pending", -
-    #     "computationStoreTime":"2024-03-14T17:06:15.452113+00:00"
-    # } -
-    # We do a GET to function/{computationId} to retrieve the actual response once calc finishes.
 
     url = base_url + "/" + function + "/" + body["computationId"]
     logger.debug(f"GET url for '{function}' is {url}")
@@ -212,6 +217,7 @@ def _specialize(base_url, entry_points):
     -------
     dict
         Mapping from endpoint name to its full URL.
+
     """
     return {k: base_url + "/" + k for k in entry_points}
 

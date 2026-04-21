@@ -10,7 +10,6 @@ Classical solvers (e.g. LASSO) impose a soft sparsity penalty that can leave man
 |--------|------|-------------|
 | **Sparse Linear Regression** | Regression with exactly k nonzero coefficients | `v1/iq-ml/linear-regression` |
 | **Sparse Logistic Regression** | Binary classification selecting exactly k features | `v1/iq-ml/logistic-regression` |
-| **Sparse FDR Regression** | Binary classification via Fisher Discriminant Ratio | `v1/iq-ml/sparse-fdr-regression` |
 
 ---
 
@@ -41,9 +40,9 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/linear-regression
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `X` | array | Feature matrix of shape (n_samples, n_features); max 100000 × 2048 |
+| `X` | array | Feature matrix of shape (n_samples, n_features) |
 | `y` | array | Observation vector of length n_samples |
-| `k` | integer | Number of nonzero coefficients (1 ≤ k ≤ n_features − 1) |
+| `k` | integer | Number of nonzero coefficients ($1 \leq k \leq n_features - 1$) |
 | `lambda_l2` | float | L2 regularization parameter (default: `0.0`) |
 | `options.copies` | integer | Number of trajectories (default: `100`) |
 | `options.tol` | float | Inner solver tolerance (default: `1e-6`) |
@@ -55,7 +54,7 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/linear-regression
 | Field | Type | Description |
 |-------|------|-------------|
 | `solution` | array | Coefficient vector of length n_features; exactly k elements are nonzero |
-| `cost` | float | Mean squared error: (1/n) ‖y − X w‖² |
+| `cost` | float | Mean squared error: (1/n) || y - X w ||^2 |
 
 ### Example API Response
 
@@ -76,16 +75,18 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/linear-regression
 
 ### Problem Definition
 
-Given a feature matrix $X \in \mathbb{R}^{n \times p}$ and a binary label vector $y \in \{-1, +1\}^n$, the sparse logistic regression problem minimizes the logistic loss with L2 regularization, selecting exactly $k$ features:
+Given a feature matrix $X \in \mathbb{R}^{n \times p}$ and a binary label vector $y \in \{0, 1\}^n$, the sparse logistic regression problem minimizes the binary cross-entropy with L2 regularization, selecting exactly $k$ features:
 
 $$
-\min_{w \in \mathbb{R}^p,\, b \in \mathbb{R}} \quad \frac{1}{n} \sum_{i=1}^{n} \log\!\left(1 + e^{-y_i (X_i w + b)}\right) + \lambda_{\ell_2} \|w\|^2
+\min_{w \in \mathbb{R}^p,\, b \in \mathbb{R}} \quad \frac{1}{n} \sum_{i=1}^{n} \left[y_i \log\,\left(p_i\right) + (1-y_i) \log\,(1-p_i)\right] + \lambda_{\ell_2} \|w\|^2
 $$
 $$
 \text{subject to} \quad \|w\|_0 = k
 $$
+with 
+$$ p_i = \frac{1}{1 + \exp(-X_i\,w - b)} $$
 
-For a fixed support, the logistic model weights and intercept $b$ are fit by standard gradient-based optimization. The support search is performed by our quantum-inspired algorithm approach.
+For a fixed set of features, the logistic model weights, $w$, and intercept, $b$, are fit by BFGS optimization. The search of the optimal set is performed by our quantum-inspired algorithm approach.
 
 ### API Endpoint
 
@@ -103,9 +104,9 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/sparse-fdr-regression
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `X` | array | Feature matrix of shape (n_samples, n_features); max 100000 × 2048 |
-| `y` | array | Binary label vector; labels should be +1 / −1 or 1 / 0 |
-| `k` | integer | Number of features to select (1 ≤ k ≤ n_features − 1) |
+| `X` | array | Feature matrix of shape (n_samples, n_features) |
+| `y` | array | Binary label vector; labels should be +1 / -1 or 1 / 0 |
+| `k` | integer | Number of features to select ($1 \leq k \leq n_features - 1$) |
 | `lambda_l2` | float | L2 regularization parameter (default: `0.0`) |
 | `accelerate` | bool | If true, uses the Fisher Discriminant Ratio as a simpler and faster classifier for the solution exploration step instead of logistic regression. Faster but may find less optimal results (default: `true`) |
 | `options.copies` | integer | Number of trajectories (default: `100`) |

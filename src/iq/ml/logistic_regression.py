@@ -97,8 +97,8 @@ def solve_sparse_logreg(
     """
     options = dict(options) if options is not None else {}
     # Validate arguments inside 'options'.
-    options["copies"] = int(validate.integer(options.get("copies", 100), 1, 500))
-    options["tol"] = float(validate.real(options.get("tol", 1e-6)))
+    options["num_states"] = int(validate.integer(options.get("num_states", 100), 1, 500))
+    options["bfgs_tolerance"] = float(validate.real(options.get("bfgs_tolerance", 1e-6)))
 
     validate.dictionary(options)
 
@@ -115,9 +115,7 @@ def solve_sparse_logreg(
             "k": validate.integer(k, 1, np.asarray(X).shape[1] - 1),
             "lambda_l2": validate.real(lambda_l2),
             "options": options,
-            "random_number_generator_seed": validate.integer(
-                random_number_generator_seed, 0, 0xFFFFFFF
-            ),
+            "seed": validate.integer(random_number_generator_seed, 0, 0xFFFFFFF),
             "description": validate.string(description),
         },
     )

@@ -156,7 +156,7 @@ X_test = scaler.transform(X_test)
 # | `k` | Number of features to select. |
 # | `lambda_l2` | L2 regularisation strength. |
 # | `accelerate` | Use Fisher Discriminant Ratio for faster exploration. |
-# | `options` | Dict with `copies` (trajectories) and `tol` (convergence). |
+# | `options` | Dict with `num_states` (population size) and `bfgs_tolerance` (convergence of the BFGS fit). |
 # | `random_number_generator_seed` | Seed for reproducibility. |
 
 # %%
@@ -166,8 +166,8 @@ LAMBDA_L2 = 1e-5 * X_train.shape[0]
 RNG_SEED = 123321
 
 options = {
-    "copies": 60,
-    "tol": 1e-3,
+    "num_states": 60,
+    "bfgs_tolerance": 1e-3,
 }
 
 # -- Call the API --------------------------------------------------------------

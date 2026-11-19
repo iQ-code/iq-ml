@@ -44,9 +44,11 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/linear-regression
 | `y` | array | Observation vector of length n_samples |
 | `k` | integer | Number of nonzero coefficients ($1 \leq k \leq n_features - 1$) |
 | `lambda_l2` | float | L2 regularization parameter (default: `0.0`) |
-| `options.copies` | integer | Number of trajectories (default: `100`) |
-| `options.tol` | float | Inner solver tolerance (default: `1e-6`) |
-| `random_number_generator_seed` | integer | RNG seed (default: `123321`) |
+| `options.num_states` | integer | Number of states (population size) (default: `60`) |
+| `options.num_temperature_steps` | integer | Number of temperature steps (default: `100`) |
+| `options.num_mcmc_sweeps` | integer | Monte Carlo sweeps at each temperature (default: `5`) |
+| `options.epsilon` | float | Controls how much the inverse temperature changes at each step (default: `0.1`) |
+| `seed` | integer | RNG seed, an unsigned 32-bit integer (default: `0`). It is a field of the request, not an option |
 | `description` | string | Optional label |
 
 ### Output Parameters
@@ -109,9 +111,12 @@ POST https://www.inspiration-q.com/api/v1/iq-ml/sparse-fdr-regression
 | `k` | integer | Number of features to select ($1 \leq k \leq n_features - 1$) |
 | `lambda_l2` | float | L2 regularization parameter (default: `0.0`) |
 | `accelerate` | bool | If true, uses the Fisher Discriminant Ratio as a simpler and faster classifier for the solution exploration step instead of logistic regression. Faster but may find less optimal results (default: `true`) |
-| `options.copies` | integer | Number of trajectories (default: `100`) |
-| `options.tol` | float | Inner solver tolerance (default: `1e-6`) |
-| `random_number_generator_seed` | integer | RNG seed (default: `123321`) |
+| `options.num_states` | integer | Number of states (population size) (default: `100`) |
+| `options.num_temperature_steps` | integer | Number of temperature steps (default: `100`) |
+| `options.num_mcmc_sweeps` | integer | Monte Carlo sweeps at each temperature (default: `5`; `1` with `accelerate`) |
+| `options.epsilon` | float | Controls how much the inverse temperature changes at each step (default: `0.1`) |
+| `options.bfgs_tolerance` | float | Convergence tolerance of the BFGS fit (default: `1e-6`) |
+| `seed` | integer | RNG seed, an unsigned 32-bit integer (default: `0`). It is a field of the request, not an option |
 | `description` | string | Optional label |
 
 ### Output Parameters

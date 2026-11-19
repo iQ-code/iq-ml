@@ -37,7 +37,7 @@ def solve_sparse_linreg(
     k: int,
     lambda_l2: float = 0.0,
     options: dict | None = None,
-    random_number_generator_seed: int = 123321,
+    random_number_generator_seed: int = 0,
     description: str = "",
 ) -> tuple[NDArray[np.float64], float]:
     """Solve a sparse linear regression problem with exactly k nonzero coefficients.
@@ -75,7 +75,7 @@ def solve_sparse_linreg(
             Number of stochastic trajectories (between 1 and 500).
         - tol : float, default=1e-6
             Relative error criterion to stop the inner linear solver.
-    random_number_generator_seed : int, default=123321
+    random_number_generator_seed : int, default=0
         Seed for the random number generator.
     description : str, default=""
         Descriptive name of the computation.
@@ -102,7 +102,7 @@ def solve_sparse_linreg(
             "k": validate.integer(k, 1, np.asarray(X).shape[1] - 1),
             "lambda_l2": validate.real(lambda_l2),
             "options": options,
-            "seed": validate.integer(random_number_generator_seed, 0, 0xFFFFFFF),
+            "seed": validate.integer(random_number_generator_seed, 0, 0xFFFFFFFF),
             "description": validate.string(description),
         },
     )

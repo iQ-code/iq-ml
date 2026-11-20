@@ -32,7 +32,7 @@ curl -X POST https://www.inspiration-q.com/api/v1/iq-ml/linear-regression \
   "y": [2.5, 0.9, -1.3, 1.8, 3.1],
   "k": 2,
   "lambda_l2": 0.01,
-  "random_number_generator_seed": 123321,
+  "seed": 123321,
   "description": "Sparse linreg example"
 }'
 ```
@@ -103,7 +103,7 @@ payload = {
     "y": [2.5, 0.9, -1.3, 1.8, 3.1],
     "k": 2,
     "lambda_l2": 0.0,
-    "random_number_generator_seed": 123321,
+    "seed": 123321,
     "description": "Sparse linreg without SDK"
 }
 

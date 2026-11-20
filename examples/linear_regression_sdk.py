@@ -34,7 +34,7 @@ w, mse = iq.ml.linear_regression.solve_sparse_linreg(
     X, y,
     k=k,
     lambda_l2=0.0,
-    options={"copies": 100},
+    options={"num_states": 100},
     random_number_generator_seed=123321,
     description="Sparse linreg example",
 )

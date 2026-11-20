@@ -37,7 +37,7 @@ def solve_sparse_logreg(
     lambda_l2: float = 0.0,
     accelerate: bool = True,
     options: dict | None = None,
-    random_number_generator_seed: int = 123321,
+    random_number_generator_seed: int = 0,
     description: str = "",
 ) -> tuple[NDArray[np.int32], NDArray[np.float64]]:
     """Solve a sparse logistic regression problem with exactly k nonzero features.
@@ -79,7 +79,7 @@ def solve_sparse_logreg(
             Number of stochastic trajectories (between 1 and 500).
         - tol : float, default=1e-6
             Relative error criterion to stop the inner logistic regression solver.
-    random_number_generator_seed : int, default=123321
+    random_number_generator_seed : int, default=0
         Seed for the random number generator.
     description : str, default=""
         Descriptive name of the computation.
@@ -97,8 +97,8 @@ def solve_sparse_logreg(
     """
     options = dict(options) if options is not None else {}
     # Validate arguments inside 'options'.
-    options["copies"] = int(validate.integer(options.get("copies", 100), 1, 500))
-    options["tol"] = float(validate.real(options.get("tol", 1e-6)))
+    options["num_states"] = int(validate.integer(options.get("num_states", 100), 1, 500))
+    options["bfgs_tolerance"] = float(validate.real(options.get("bfgs_tolerance", 1e-6)))
 
     validate.dictionary(options)
 
@@ -115,9 +115,7 @@ def solve_sparse_logreg(
             "k": validate.integer(k, 1, np.asarray(X).shape[1] - 1),
             "lambda_l2": validate.real(lambda_l2),
             "options": options,
-            "random_number_generator_seed": validate.integer(
-                random_number_generator_seed, 0, 0xFFFFFFF
-            ),
+            "seed": validate.integer(random_number_generator_seed, 0, 0xFFFFFFFF),
             "description": validate.string(description),
         },
     )
